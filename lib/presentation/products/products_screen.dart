@@ -50,49 +50,53 @@ class ProductsScreen extends StatelessWidget {
           ),
           body: Column(
             children: [
-              Obx(() {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: controller.categories.map((category) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 10.0),
-                        child: ChoiceChip(
-                          label: Text(category),
-                          selected:
-                              controller.selectedCategory.value == category,
-                          onSelected: (isSelected) {
-                            controller.selectCategory(category);
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                );
-              }),
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return Center(child: CircularProgressIndicator());
-                  } else {
-                    return ListView.builder(
-                      itemCount: controller.filteredProducts.length,
-                      itemBuilder: (context, index) {
-                        final product = controller.filteredProducts[index];
-                        return ListTile(
-                          onTap: () {
-                            Get.toNamed("/productD", arguments: product);
-                          },
-                          leading: Image.network(product.image,
-                              width: 50, height: 50),
-                          title: Text(product.title),
-                          subtitle: Text("\$${product.price}"),
+              GetBuilder<ProductController>(
+                builder: (_) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: controller.categories.map((category) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 10.0),
+                          child: ChoiceChip(
+                            label: Text(category),
+                            selected:
+                                controller.selectedCategory.value == category,
+                            onSelected: (isSelected) {
+                              controller.selectCategory(category);
+                            },
+                          ),
                         );
-                      },
-                    );
-                  }
-                }),
+                      }).toList(),
+                    ),
+                  );
+                },
+              ),
+              Expanded(
+                child: GetBuilder<ProductController>(
+                  builder: (_) {
+                    if (controller.isLoading.value) {
+                      return Center(child: CircularProgressIndicator());
+                    } else {
+                      return ListView.builder(
+                        itemCount: controller.filteredProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = controller.filteredProducts[index];
+                          return ListTile(
+                            onTap: () {
+                              Get.toNamed("/productD", arguments: product);
+                            },
+                            leading: Image.network(product.image,
+                                width: 50, height: 50),
+                            title: Text(product.title),
+                            subtitle: Text("\$${product.price}"),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
               ),
             ],
           ),

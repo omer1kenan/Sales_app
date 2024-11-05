@@ -48,5 +48,6 @@ class ProductController extends GetxController {
 
   void selectCategory(String category) {
     selectedCategory.value = category;
+    update();
   }
 }
