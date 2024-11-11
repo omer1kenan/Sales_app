@@ -16,6 +16,12 @@ class ProductsScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text("Products"),
             actions: [
+              IconButton(
+                icon: Icon(Icons.person),
+                onPressed: () {
+                  Get.toNamed("/profile");
+                },
+              ),
               Stack(
                 children: [
                   IconButton(
@@ -48,38 +54,31 @@ class ProductsScreen extends StatelessWidget {
               ),
             ],
           ),
-          body: Column(
-            children: [
-              GetBuilder<ProductController>(
-                builder: (_) {
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: controller.categories.map((category) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 10.0),
-                          child: ChoiceChip(
-                            label: Text(category),
-                            selected:
-                                controller.selectedCategory.value == category,
-                            onSelected: (isSelected) {
-                              controller.selectCategory(category);
-                            },
-                          ),
-                        );
-                      }).toList(),
+          body: controller.isLoading.value
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: controller.categories.map((category) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 10.0),
+                            child: ChoiceChip(
+                              label: Text(category),
+                              selected:
+                                  controller.selectedCategory.value == category,
+                              onSelected: (isSelected) {
+                                controller.selectCategory(category);
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  );
-                },
-              ),
-              Expanded(
-                child: GetBuilder<ProductController>(
-                  builder: (_) {
-                    if (controller.isLoading.value) {
-                      return Center(child: CircularProgressIndicator());
-                    } else {
-                      return ListView.builder(
+                    Expanded(
+                      child: ListView.builder(
                         itemCount: controller.filteredProducts.length,
                         itemBuilder: (context, index) {
                           final product = controller.filteredProducts[index];
@@ -93,13 +92,10 @@ class ProductsScreen extends StatelessWidget {
                             subtitle: Text("\$${product.price}"),
                           );
                         },
-                      );
-                    }
-                  },
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         );
       },
     );

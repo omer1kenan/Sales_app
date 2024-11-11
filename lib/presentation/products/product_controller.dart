@@ -26,6 +26,7 @@ class ProductController extends GetxController {
       Get.snackbar("Error", "Failed to fetch products");
     } finally {
       isLoading.value = false;
+      update();
     }
   }
 
