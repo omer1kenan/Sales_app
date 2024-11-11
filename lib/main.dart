@@ -10,7 +10,6 @@ import 'package:sales_app/presentation/profile/profile_screen.dart';
 import 'presentation/products/products_screen.dart';
 
 void main() {
-  Get.put(AuthController());
   runApp(const MyApp());
 }
 

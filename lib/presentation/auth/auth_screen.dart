@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sales_app/data/datasources/auth_remote_data_source.dart';
+import 'package:sales_app/data/repositories/auth_repository.dart';
+import 'package:sales_app/domain/usecases/login_use_case.dart';
 import 'auth_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(
-      init: AuthController(),
+      init:
+          AuthController(LoginUseCase(AuthRepository(AuthRemoteDataSource()))),
       builder: (AuthController controller) {
         return Scaffold(
           appBar: AppBar(
@@ -18,10 +22,10 @@ class LoginScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextField(
-                  onChanged: controller.updateEmail,
+                  onChanged: controller.updateUsername,
                   decoration: InputDecoration(
-                    labelText: "Email",
-                    hintText: "Enter your email",
+                    labelText: "Username",
+                    hintText: "Enter your username",
                   ),
                 ),
                 SizedBox(height: 16),

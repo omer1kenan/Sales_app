@@ -1,89 +1,37 @@
-import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sales_app/data/models/user.dart';
-import 'package:sales_app/presentation/loading/loading_screen.dart';
-import 'package:sales_app/utils/constants.dart';
-import 'package:http/http.dart' as http;
+import 'package:sales_app/domain/usecases/login_use_case.dart';
 
 class AuthController extends GetxController {
-  var email = ''.obs;
-  var password = ''.obs;
-  var user = Rxn<User>();
+  final LoginUseCase loginUseCase;
 
-  void updateEmail(String newEmail) {
-    email.value = newEmail;
+  AuthController(this.loginUseCase);
+
+  var username = ''.obs;
+  var password = ''.obs;
+
+  void updateUsername(String newUsername) {
+    username.value = newUsername;
   }
 
   void updatePassword(String newPassword) {
     password.value = newPassword;
   }
 
-  void showLoading() {
+  Future<void> login() async {
     Get.dialog(
-      LoadingScreen(),
+      Center(child: CircularProgressIndicator()),
       barrierDismissible: false,
     );
-  }
 
-  void hideLoading() {
-    if (Get.isDialogOpen ?? false) {
-      Get.back();
-    }
-  }
+    final token = await loginUseCase(username.value, password.value);
+    Get.back();
 
-  Future<void> login() async {
-    showLoading();
-    try {
-      final response = await http.post(
-        Uri.parse("${ApiConstants.baseUrl}${ApiConstants.loginEndpoint}"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "username": email.value,
-          "password": password.value,
-        }),
-      );
-      hideLoading();
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final token = data["token"];
-        if (token != null) {
-          User? fetchedUser = await fetchUserData();
-          if (fetchedUser != null) {
-            user.value = fetchedUser;
-            update();
-            Get.offAllNamed("/products");
-            Get.snackbar("Success", "Login successful");
-          } else {
-            Get.snackbar("Error", "Failed to load user data.");
-          }
-        } else {
-          Get.snackbar("Error", "Invalid login response");
-        }
-      } else {
-        Get.snackbar("Error", "Login failed. Check your credentials.");
-      }
-    } catch (e) {
-      hideLoading();
-      Get.snackbar("Error", "Failed to connect to the server.");
-    }
-  }
-
-  Future<User?> fetchUserData() async {
-    try {
-      final response = await http.get(
-        Uri.parse("${ApiConstants.baseUrl}/users/1"),
-      );
-
-      if (response.statusCode == 200) {
-        return User.fromJson(jsonDecode(response.body));
-      } else {
-        Get.snackbar("Error", "Failed to fetch user data");
-        return null;
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Failed to connect to the server.");
-      return null;
+    if (token != null) {
+      Get.offAllNamed("/products");
+      Get.snackbar("Success", "Login successful");
+    } else {
+      Get.snackbar("Error", "Invalid login credentials.");
     }
   }
 }
